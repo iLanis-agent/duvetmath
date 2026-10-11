@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duvet math - calculators</title>
+<style>
+  :root { --accent: #9a7ba8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #faf8fb; color: #2c2830; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #e4dee8; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #716a7a; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #cfc6d6; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.08); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #968fa0; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Duvet math</h1>
+  <p class="lede">The size to buy, the fill inside and what it costs per night. Exact arithmetic, every borrowed number labeled.</p>
+  <div class="grid">
+    <section>
+      <h2>Size plan</h2>
+      <p class="hint">A bed becomes a duvet size.</p>
+      <label for="s-width">Bed width (cm)</label>
+      <input id="s-width" type="number" value="140" min="0" step="10">
+      <label for="s-length">Bed length (cm)</label>
+      <input id="s-length" type="number" value="200" min="0" step="10">
+      <label for="s-drop">Drop wanted (cm)</label>
+      <input id="s-drop" type="number" value="20" min="0" step="5">
+      <button id="s-go">Size the duvet</button>
+      <div class="out" id="s-out"></div>
+    </section>
+    <section>
+      <h2>Fill plan</h2>
+      <p class="hint">A cover becomes grams of fill.</p>
+      <label for="f-width">Duvet width (cm)</label>
+      <input id="f-width" type="number" value="200" min="0" step="10">
+      <label for="f-length">Duvet length (cm)</label>
+      <input id="f-length" type="number" value="220" min="0" step="10">
+      <label for="f-gsm">Fill density (gsm)</label>
+      <input id="f-gsm" type="number" value="150" min="0" step="10">
+      <button id="f-go">Weigh the fill</button>
+      <div class="out" id="f-out"></div>
+    </section>
+    <section>
+      <h2>Night-cost plan</h2>
+      <p class="hint">A price becomes a cost per night.</p>
+      <label for="n-price">Price</label>
+      <input id="n-price" type="number" value="120" min="0" step="5">
+      <label for="n-years">Years kept</label>
+      <input id="n-years" type="number" value="5" min="0" step="1">
+      <button id="n-go">Price the nights</button>
+      <div class="out" id="n-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/duvetmath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('s-go').addEventListener('click', function(){
+  show('s-out', DuvetMath.sizePlan(num('s-width'),num('s-length'),num('s-drop')), function(r){ return DuvetMath.renderSize(r, num('s-width'), num('s-length'), num('s-drop')); });
+});
+document.getElementById('f-go').addEventListener('click', function(){
+  show('f-out', DuvetMath.fillPlan(num('f-width'),num('f-length'),num('f-gsm')), function(r){ return DuvetMath.renderFill(r, num('f-gsm')); });
+});
+document.getElementById('n-go').addEventListener('click', function(){
+  show('n-out', DuvetMath.nightCostPlan(num('n-price'),num('n-years')), function(r){ return DuvetMath.renderNightCost(r, num('n-price'), num('n-years')); });
+});
+</script>
+</body>
+</html>
